@@ -14,6 +14,12 @@ class UsersViews(APIView):
         users = UserSerializer(User.objects.all(), many=True).data
         return Response({'users': users})
 
+    def post(self, request):
+        names = request.data.get('users')
+        users = UserSerializer(User.objects.filter(
+            name__in=names), many=True).data
+        return Response({'users': users})
+
 
 class AddUserViews(APIView):
 
