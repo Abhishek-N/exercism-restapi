@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Users
+
+from exercism.restapi.serializers import UserSerializer
+from .models import User
 
 # Create your views here.
 
@@ -9,5 +11,15 @@ from .models import Users
 class UsersViews(APIView):
 
     def get(self, request):
-        users = [user.name for user in Users.objects.all()]
-        return Response(users)
+        users = UserSerializer(User.objects.all(), many=True).data
+        return Response({'users': users})
+
+
+class AddUserViews(APIView):
+
+    def post(self, request):
+        name = request.data.get('user')
+        serializer = UserSerializer(data={'name': name})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
